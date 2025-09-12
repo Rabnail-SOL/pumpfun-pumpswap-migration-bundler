@@ -26,10 +26,10 @@ import {
   PUMP_AMM_PROGRAM_ID,
   COMMITMENT,
 } from './constants'
-import PumpswapIDL from './contract/pumpswap.json'
-import PumpfunIDL from './contract/pump-fun.json'
-import { PumpSwap } from './contract/pumpswap'
-import { PumpFun } from './contract/pump-fun'
+import PumpswapIDL from './contract/pumpswap-idl.json'
+import PumpfunIDL from './contract/pumpfun-idl.json'
+import { PumpAmm } from './contract/pumpswap-types'
+import { Pump } from './contract/pumpfun-types'
 import { AnchorProvider, BN, Program, setProvider } from '@coral-xyz/anchor'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { buy, getPoolsWithBaseMintQuoteWSOL, sell } from './src/swap'
@@ -48,8 +48,8 @@ const poolId = new PublicKey(POOL_ID)
 const provider = new AnchorProvider(solanaConnection, new NodeWallet(Keypair.generate()))
 setProvider(provider);
 
-export const PumpswapProgram = new Program<PumpSwap>(PumpswapIDL as PumpSwap, provider);
-export const PumpfunProgram = new Program<PumpFun>(PumpfunIDL as PumpFun, provider);
+export const PumpswapProgram = new Program<PumpAmm>(PumpswapIDL as PumpAmm, provider);
+export const PumpfunProgram = new Program<Pump>(PumpfunIDL as Pump, provider);
 
 // const main = async () => {
 //   try {
@@ -169,45 +169,49 @@ const main = async () => {
   //   }
   // )
 
-  const launchListenerId = PumpswapProgram.addEventListener("createPoolEvent", (event, slot, signature) => {
+  // const launchListenerId = PumpswapProgram.addEventListener("createPoolEvent", (event, slot, signature) => {
 
-    const { creator, baseMint, quoteMint, baseAmountIn, quoteAmountIn, timestamp, lpMint, pool } = event
-    console.log("\n\n================ New Pool Created ================")
-    console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
-    console.log("Creator:", creator.toBase58())
-    console.log("Pool ID:", pool.toBase58())
-    console.log("BaseMint:", baseMint.toBase58())
-    console.log("QuoteMint:", quoteMint.toBase58())
-    console.log("BaseAmountIn:", baseAmountIn.toString())
-    console.log("QuoteAmountIn:", quoteAmountIn.toString())
-    console.log("Timestamp:", new Date(timestamp.toNumber()))
-    console.log("Lp Mint:", lpMint.toBase58())
-    console.log("===================================================\n\n")
+  //   const { creator, baseMint, quoteMint, baseAmountIn, quoteAmountIn, timestamp, lpMint, pool } = event
+  //   console.log("\n\n================ New Pool Created ================")
+  //   console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
+  //   console.log("Creator:", creator.toBase58())
+  //   console.log("Pool ID:", pool.toBase58())
+  //   console.log("BaseMint:", baseMint.toBase58())
+  //   console.log("QuoteMint:", quoteMint.toBase58())
+  //   console.log("BaseAmountIn:", baseAmountIn.toString())
+  //   console.log("QuoteAmountIn:", quoteAmountIn.toString())
+  //   console.log("Timestamp:", new Date(timestamp.toNumber()))
+  //   console.log("Lp Mint:", lpMint.toBase58())
+  //   console.log("===================================================\n\n")
 
-  })
+  // })
 
-  const migrateListener = PumpfunProgram.addEventListener("completePumpAmmMigrationEvent", (event, slot, signature) => {
-    const { creator, timestamp, pool, bondingCurve, mint } = event
+  // const migrateListener = PumpfunProgram.addEventListener("completePumpAmmMigrationEvent", (event, slot, signature) => {
+  //   const { creator, timestamp, pool, bondingCurve, mint } = event
 
-    console.log("\n\n================ Migration event fetched ================")
-    console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
-    console.log("Creator: ", creator?.toBase58())
-    console.log("Pool: ", pool?.toBase58())
-    console.log("BondingCurve: ", bondingCurve.toBase58())
-    console.log("Timestamp:", new Date(timestamp.toNumber()))
-    console.log("===================================================\n\n")
-  })
+  //   console.log("\n\n================ Migration event fetched ================")
+  //   console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
+  //   console.log("Creator: ", creator?.toBase58())
+  //   console.log("Pool: ", pool?.toBase58())
+  //   console.log("BondingCurve: ", bondingCurve.toBase58())
+  //   console.log("Timestamp:", new Date(timestamp.toNumber()))
+  //   console.log("===================================================\n\n")
+  // })
 
-  const completeListener = PumpfunProgram.addEventListener("completeEvent", (event, slot, signature) => {
-    const { user, timestamp, bondingCurve, mint } = event
+  // const completeListener = PumpfunProgram.addEventListener("completeEvent", (event, slot, signature) => {
+  //   const { user, timestamp, bondingCurve, mint } = event
 
-    console.log("\n\n================ Migration event fetched ================")
-    console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
-    console.log("User: ", user?.toBase58())
-    console.log("Mint: ", mint.toBase58())
-    console.log("BondingCurve: ", bondingCurve.toBase58())
-    console.log("Timestamp:", new Date(timestamp.toNumber()))
-    console.log("===================================================\n\n")
+  //   console.log("\n\n================ Migration event fetched ================")
+  //   console.log(`Pool creation signature: https://solscan.io/tx/${signature}`)
+  //   console.log("User: ", user?.toBase58())
+  //   console.log("Mint: ", mint.toBase58())
+  //   console.log("BondingCurve: ", bondingCurve.toBase58())
+  //   console.log("Timestamp:", new Date(timestamp.toNumber()))
+  //   console.log("===================================================\n\n")
+  // })
+
+  const tradeEvent = PumpfunProgram.addEventListener("tradeEvent", (event, slot, sig) => {
+    console.log("🚀 ~ tradeEvent ~ event:", event)
   })
 
   // const buyListenerId = PumpProgram.addEventListener("buyEvent", (event, slot, signature) => {console.log("Buy event: \n", signature, slot, "\n", event)})
