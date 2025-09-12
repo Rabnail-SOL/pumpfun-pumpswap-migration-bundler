@@ -1,6 +1,6 @@
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { BN, Program } from "@coral-xyz/anchor";
-import { GLOBAL_CONFIG, POOL_ID, PROTOCOL_FEE_RECIPIENT, PUMP_AMM_PROGRAM_ID } from "../constants";
+import { GLOBAL_CONFIG, PROTOCOL_FEE_RECIPIENT, PUMP_AMM_PROGRAM_ID } from "../constants";
 import { createAssociatedTokenAccountIdempotentInstruction, createCloseAccountInstruction, createSyncNativeInstruction, getAssociatedTokenAddressSync, NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { PumpSwap } from "../contract/pumpswap";
@@ -127,38 +127,4 @@ export const sell = async (
   console.log(await connection.simulateTransaction(sellTx))
   const sig = await sendAndConfirmTransaction(connection, sellTx, [sellerKp])
   console.log(`Sell transaction signature: https://solscan.io/tx/${sig}`)
-}
-
-export const getPoolsWithBaseMintQuoteWSOL = async (connection: Connection, baseMint: PublicKey, quoteMint: PublicKey, program: Program<PumpSwap>) => {
-  const response = await connection.getProgramAccounts(PUMP_AMM_PROGRAM_ID, {
-    filters: [
-      { "dataSize": 211 },
-      {
-        "memcmp": {
-          "offset": 43,
-          "bytes": baseMint.toBase58()
-        }
-      },
-      {
-        "memcmp": {
-          "offset": 75,
-          "bytes": quoteMint.toBase58()
-        }
-      }
-    ]
-  }
-  )
-
-  const mappedPools = response.map((pool) => {
-    const data = Buffer.from(pool.account.data);
-    const poolData = program.coder.accounts.decode('pool', data);
-    return {
-      address: pool.pubkey,
-      is_native_base: true,
-      poolData
-    };
-  }).filter((data) => data.address.toBase58() == POOL_ID)
-  if (mappedPools.length == 1)
-    return mappedPools[0]
-  return 
 }
