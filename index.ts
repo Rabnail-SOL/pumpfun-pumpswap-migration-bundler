@@ -22,7 +22,7 @@ import PumpswapIDL from './contract/pumpswap-idl.json'
 import PumpfunIDL from './contract/pumpfun-idl.json'
 import { PumpAmm } from './contract/pumpswap-types'
 import { Pump } from './contract/pumpfun-types'
-import { AnchorProvider, BN, Program, setProvider } from '@coral-xyz/anchor'
+import { AnchorProvider, Program, setProvider } from '@coral-xyz/anchor'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { createAssociatedTokenAccountInstruction, createCloseAccountInstruction, createTransferCheckedInstruction, getAssociatedTokenAddressSync, NATIVE_MINT } from '@solana/spl-token'
 import { sendAndConfirmTransaction } from '@solana/web3.js';
@@ -92,12 +92,12 @@ const main = async () => {
     }).compileToV0Message()
   )
   const vTxs: VersionedTransaction[] = [jitoTipTx, buyTx, migrateTx]
-  // const result = await sendBundle(vTxs)
-  // if (result) {
-  //   console.log("Bundle result ", result)
-  // } else {
-  //   console.log("Bundle failed")
-  // }
+  const result = await sendBundle(vTxs)
+  if (result) {
+    console.log("Bundle result ", result)
+  } else {
+    console.log("Bundle failed")
+  }
 }
 
 main()

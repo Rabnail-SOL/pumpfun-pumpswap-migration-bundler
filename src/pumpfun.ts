@@ -5,6 +5,8 @@ import { Pump } from '../contract/pumpfun-types'
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { BN } from "bn.js";
 import { FEE_RECIPIENT, RPC_ENDPOINT, RPC_WEBSOCKET_ENDPOINT } from "../constants";
+import { createTokenMetadata } from "@pumpswap-sdk4/metadata";
+import { openAsBlob } from "fs";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
 const solanaConnection = new Connection(RPC_ENDPOINT, {
@@ -52,6 +54,16 @@ export const makeBuyPumpfunTokenTx = async (mainKp: Keypair, mint: PublicKey) =>
 
 export const makeMigrateTx = async (mainKp: Keypair, mint: PublicKey) => {
   try {
+    await createTokenMetadata({
+      name: "CDS",
+      symbol: "CDS",
+      description: "CDS corn dog spud",
+      file: await openAsBlob("./src/1.jpg"),
+      telegram: "https://t.me",
+      twitter: "https://twitter.com/",
+      website: "https://my_site.com"
+    });
+    
     const migrateIx = await PumpfunProgram.methods
       .migrate()
       .accounts({
