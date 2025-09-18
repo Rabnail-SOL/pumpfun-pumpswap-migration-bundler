@@ -92,12 +92,12 @@ const main = async () => {
     }).compileToV0Message()
   )
   const vTxs: VersionedTransaction[] = [jitoTipTx, buyTx, migrateTx]
-  // const result = await sendBundle(vTxs)
-  // if (result) {
-  //   console.log("Bundle result ", result)
-  // } else {
-  //   console.log("Bundle failed")
-  // }
+  const result = await sendBundle(vTxs)
+  if (result) {
+    console.log("Bundle result ", result)
+  } else {
+    console.log("Bundle failed")
+  }
 }
 
 main()
